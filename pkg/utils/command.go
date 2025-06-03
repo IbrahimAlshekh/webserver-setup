@@ -114,7 +114,10 @@ func RunCommandWithFileInput(inputFile string, command string, args ...string) e
 	}
 
 	// Close stdin to signal EOF
-	stdin.Close()
+	err = stdin.Close()
+	if err != nil {
+		return err
+	}
 
 	// Wait for the command to complete
 	return cmd.Wait()
