@@ -28,12 +28,32 @@ func runConfigStep(name string, fn func(*config.Config) error, cfg *config.Confi
 	}
 }
 
+// getSkipStatus returns a string indicating whether a step will be skipped
+func getSkipStatus(skip bool) string {
+	if skip {
+		return " (will be skipped)"
+	}
+	return ""
+}
+
 func main() {
 	// Define command-line flags
 	cleanupFlag := flag.Bool("cleanup", false, "Clean up temporary files created during the setup process")
+	configPathFlag := flag.String("config-path", "", "Path to the configuration file (default: ~/config.toml)")
+
+	// Module selection flags
+	skipSystemUpdateFlag := flag.Bool("skip-system-update", false, "Skip system update step")
+	skipEssentialsFlag := flag.Bool("skip-essentials", false, "Skip installing essential packages")
+	skipPHPFlag := flag.Bool("skip-php", false, "Skip PHP installation")
+	skipMySQLFlag := flag.Bool("skip-mysql", false, "Skip MySQL installation")
+	skipNginxFlag := flag.Bool("skip-nginx", false, "Skip Nginx installation")
+	skipSecurityFlag := flag.Bool("skip-security", false, "Skip security configuration")
+	skipLaravelFlag := flag.Bool("skip-laravel", false, "Skip Laravel setup")
+	skipServicesFlag := flag.Bool("skip-services", false, "Skip services configuration")
+
 	flag.Parse()
 
-	// Check if cleanup flag is set
+	// Check if a cleanup flag is set
 	if *cleanupFlag {
 		err := utils.CleanupTempFiles()
 		if err != nil {
@@ -57,7 +77,7 @@ func main() {
 	}
 
 	// Initialize configuration
-	cfg, err := config.InitConfig()
+	cfg, err := config.InitConfig(*configPathFlag)
 	if err != nil {
 		utils.PrintError("Failed to initialize configuration: " + err.Error())
 		os.Exit(1)
@@ -70,17 +90,21 @@ func main() {
 	utils.PrintHeader("Starting Laravel Server Setup Process")
 	utils.PrintStatus("This script will set up a complete Laravel production server")
 	utils.PrintStatus("The setup process is divided into several steps:")
-	utils.PrintStatus("1. System update")
-	utils.PrintStatus("2. Installing essential packages")
-	utils.PrintStatus("3. Installing PHP 8.3 and extensions")
-	utils.PrintStatus("4. Installing and configuring MySQL")
-	utils.PrintStatus("5. Installing and configuring Nginx")
-	utils.PrintStatus("6. Configuring security (firewall, fail2ban, SSH)")
-	utils.PrintStatus("7. Setting up Laravel application")
-	utils.PrintStatus("8. Configuring and starting services")
+	utils.PrintStatus("1. System update" + getSkipStatus(*skipSystemUpdateFlag))
+	utils.PrintStatus("2. Installing essential packages" + getSkipStatus(*skipEssentialsFlag))
+	utils.PrintStatus("3. Installing PHP 8.3 and extensions" + getSkipStatus(*skipPHPFlag))
+	utils.PrintStatus("4. Installing and configuring MySQL" + getSkipStatus(*skipMySQLFlag))
+	utils.PrintStatus("5. Installing and configuring Nginx" + getSkipStatus(*skipNginxFlag))
+	utils.PrintStatus("6. Configuring security (firewall, fail2ban, SSH)" + getSkipStatus(*skipSecurityFlag))
+	utils.PrintStatus("7. Setting up Laravel application" + getSkipStatus(*skipLaravelFlag))
+	utils.PrintStatus("8. Configuring and starting services" + getSkipStatus(*skipServicesFlag))
 	utils.PrintStatus("")
 	utils.PrintWarning("This process may take some time. Please be patient.")
 	utils.PrintWarning("You will be prompted for input at certain stages.")
+	utils.PrintStatus("")
+	utils.PrintStatus("Note: You can skip any step by using the corresponding command-line flag:")
+	utils.PrintStatus("  --skip-system-update, --skip-essentials, --skip-php, --skip-mysql,")
+	utils.PrintStatus("  --skip-nginx, --skip-security, --skip-laravel, --skip-services")
 	utils.PrintStatus("")
 
 	fmt.Print("Press Enter to begin the setup process...")
@@ -90,15 +114,64 @@ func main() {
 		return
 	}
 
-	// Run each step of the setup process
-	runConfigStep("System Update", system.Update, nil)
-	runConfigStep("Install Essentials", system.InstallEssentials, nil)
-	runConfigStep("Install PHP", php.Install, nil)
-	runConfigStep("Install MySQL", mysql.Install, cfg)
-	runConfigStep("Install Nginx", nginx.Install, cfg)
-	runConfigStep("Configure Security", security.Configure, cfg)
-	runConfigStep("Setup Laravel", laravel.Setup, cfg)
-	runConfigStep("Configure Services", services.Configure, cfg)
+	// Apply skip flags from config file if not overridden by command-line flags
+	skipSystemUpdate := *skipSystemUpdateFlag || cfg.SkipSystemUpdate
+	skipEssentials := *skipEssentialsFlag || cfg.SkipEssentials
+	skipPHP := *skipPHPFlag || cfg.SkipPHP
+	skipMySQL := *skipMySQLFlag || cfg.SkipMySQL
+	skipNginx := *skipNginxFlag || cfg.SkipNginx
+	skipSecurity := *skipSecurityFlag || cfg.SkipSecurity
+	skipLaravel := *skipLaravelFlag || cfg.SkipLaravel
+	skipServices := *skipServicesFlag || cfg.SkipServices
+
+	// Run each step of the setup process, skipping those that the user has opted to skip
+	if !skipSystemUpdate {
+		runConfigStep("System Update", system.Update, nil)
+	} else {
+		utils.PrintStatus("Skipping System Update step as requested")
+	}
+
+	if !skipEssentials {
+		runConfigStep("Install Essentials", system.InstallEssentials, nil)
+	} else {
+		utils.PrintStatus("Skipping Install Essentials step as requested")
+	}
+
+	if !skipPHP {
+		runConfigStep("Install PHP", php.Install, nil)
+	} else {
+		utils.PrintStatus("Skipping PHP Installation step as requested")
+	}
+
+	if !skipMySQL {
+		runConfigStep("Install MySQL", mysql.Install, cfg)
+	} else {
+		utils.PrintStatus("Skipping MySQL Installation step as requested")
+	}
+
+	if !skipNginx {
+		runConfigStep("Install Nginx", nginx.Install, cfg)
+	} else {
+		utils.PrintStatus("Skipping Nginx Installation step as requested")
+	}
+
+	if !skipSecurity {
+		runConfigStep("Configure Security", security.Configure, cfg)
+	} else {
+		utils.PrintStatus("Skipping Security Configuration step as requested")
+	}
+
+	if !skipLaravel {
+		runConfigStep("Setup Laravel", laravel.Setup, cfg)
+	} else {
+		utils.PrintStatus("Skipping Laravel Setup step as requested")
+	}
+
+	if !skipServices {
+		runConfigStep("Configure Services", services.Configure, cfg)
+	} else {
+		utils.PrintStatus("Skipping Services Configuration step as requested")
+	}
 
 	// Final message
 	utils.PrintHeader("Setup Complete!")

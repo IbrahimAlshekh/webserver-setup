@@ -59,6 +59,12 @@ A Go tool to automate the setup of a production-ready Laravel server on Ubuntu.
    make install
    ```
 
+4. (Optional) Upload the binary and example configuration file to a remote server:
+   ```
+   make upload
+   ```
+   This will build the Linux binary and upload both the binary and the example configuration file to the server.
+
 ## Usage
 
 Run the tool:
@@ -72,6 +78,74 @@ Or if you installed it to /usr/local/bin:
 ```
 laravel-setup
 ```
+
+### Module Selection
+
+You can choose which modules to run by using command-line flags. This is useful if you've already completed some steps and don't want to repeat them:
+
+```
+laravel-setup --skip-mysql --skip-nginx
+```
+
+Available skip flags:
+
+- `--skip-system-update`: Skip system update step
+- `--skip-essentials`: Skip installing essential packages
+- `--skip-php`: Skip PHP installation
+- `--skip-mysql`: Skip MySQL installation
+- `--skip-nginx`: Skip Nginx installation
+- `--skip-security`: Skip security configuration
+- `--skip-laravel`: Skip Laravel setup
+- `--skip-services`: Skip services configuration
+
+### Configuration File
+
+You can use a TOML configuration file to store your settings and skip flags. The tool will look for a `config.toml` file in your home directory by default, or you can specify a custom path:
+
+```
+laravel-setup --config-path=/path/to/config.toml
+```
+
+The configuration file can include all settings and skip flags. The tool will only prompt for values that are not defined in the config file. Command-line flags take precedence over configuration file settings.
+
+Example `config.toml`:
+
+```toml
+# Laravel Setup Configuration
+
+# Basic settings
+Domain = "example.com"
+RepoURL = "https://github.com/user/laravel-project.git"
+DBName = "production_db"
+DBUser = "db_user"
+DBPassword = "your-secure-password"  # Leave empty to generate a random password
+DBRootPassword = "your-secure-root-password"  # Leave empty to generate a random password
+WebUser = "www-data"
+SSHPort = "2222"
+WebRoot = "/var/www/example.com"  # Leave empty to use /var/www/[Domain]
+
+# Skip flags - set to true to skip the corresponding step
+SkipSystemUpdate = false
+SkipEssentials = false
+SkipPHP = false
+SkipMySQL = false
+SkipNginx = false
+SkipSecurity = false
+SkipLaravel = false
+SkipServices = false
+```
+
+A sample configuration file is available in the `examples` directory.
+
+### Cleanup
+
+To clean up temporary files created during the setup process:
+
+```
+laravel-setup --cleanup
+```
+
+### Setup Process
 
 The tool will guide you through the setup process, asking for:
 

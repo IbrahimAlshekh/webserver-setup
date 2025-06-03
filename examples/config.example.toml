@@ -1,0 +1,22 @@
+# Laravel Setup Configuration
+
+# Basic settings
+Domain = "example.com"
+RepoURL = "https://github.com/user/laravel-project.git"
+DBName = "production_db"
+DBUser = "db_user"
+DBPassword = "your-secure-password"  # Leave empty to generate a random password
+DBRootPassword = "your-secure-root-password"  # Leave empty to generate a random password
+WebUser = "www-data"
+SSHPort = "2222"
+WebRoot = "/var/www/example.com"  # Leave empty to use /var/www/[Domain]
+
+# Skip flags - set to true to skip the corresponding step
+SkipSystemUpdate = false
+SkipEssentials = false
+SkipPHP = false
+SkipMySQL = false
+SkipNginx = false
+SkipSecurity = false
+SkipLaravel = false
+SkipServices = false

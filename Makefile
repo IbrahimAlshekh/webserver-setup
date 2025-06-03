@@ -43,7 +43,8 @@ run: build
 
 upload: build-linux
 	@echo "Uploading to server"
-	@scp ./laravel-setup-linux skillshare:~/
+	@scp ./laravel-setup-linux ./examples/config.example.toml skillshare:~/
+	@rm -rf laravel-setup-linux
 
 # Help message
 help:
@@ -58,6 +59,7 @@ help:
 	@echo "  make clean        - Clean build artifacts"
 	@echo "  make install      - Install the binary to /usr/local/bin"
 	@echo "  make run          - Run the binary"
+	@echo "  make upload       - Upload the Linux binary and example config to server"
 	@echo "  make help         - Show this help message"
 
 # Default target
