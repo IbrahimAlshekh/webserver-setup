@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 
@@ -28,6 +29,20 @@ func runConfigStep(name string, fn func(*config.Config) error, cfg *config.Confi
 }
 
 func main() {
+	// Define command-line flags
+	cleanupFlag := flag.Bool("cleanup", false, "Clean up temporary files created during the setup process")
+	flag.Parse()
+
+	// Check if cleanup flag is set
+	if *cleanupFlag {
+		err := utils.CleanupTempFiles()
+		if err != nil {
+			utils.PrintError("Failed to clean up temporary files: " + err.Error())
+			os.Exit(1)
+		}
+		os.Exit(0)
+	}
+
 	// Print a welcome message
 	utils.PrintHeader("Laravel Production Server Setup")
 
@@ -94,6 +109,8 @@ func main() {
 	utils.PrintWarning("1. Point your domain DNS to this server")
 	utils.PrintWarning("2. Set up SSL certificate if you haven't already")
 	utils.PrintWarning("3. Change SSH port in your SSH client to: " + cfg.SSHPort)
+	utils.PrintStatus("")
+	utils.PrintStatus("You can clean up temporary files by running: laravel-setup -cleanup")
 
 	fmt.Printf("%sYour Laravel production server is ready!%s\n", utils.ColorGreen, utils.ColorReset)
 }
