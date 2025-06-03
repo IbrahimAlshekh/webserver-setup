@@ -50,7 +50,7 @@ func Install(config *config.Config) error {
 	}
 
 	// Apply MySQL configuration
-	err = utils.RunCommandWithFileInput("mysql_config.sql", "sudo", "mysql")
+	err = utils.RunCommand("sudo", "mysql", "<", "mysql_config.sql")
 	if err != nil {
 		return err
 	}

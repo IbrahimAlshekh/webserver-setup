@@ -10,10 +10,12 @@ func GetMySQLConfig(dbName, dbUser, dbPassword, dbRootPassword string) string {
 CREATE DATABASE IF NOT EXISTS %s CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Create Laravel user with restricted permissions
+DELETE FROM mysql.user WHERE User='%s' AND Host='localhost';
 CREATE USER IF NOT EXISTS '%s'@'localhost' IDENTIFIED BY '%s';
 GRANT ALL PRIVILEGES ON %s.* TO '%s'@'localhost';
 
 -- Create admin user for easier database management
+DELETE FROM mysql.user WHERE User='admin' AND Host='localhost';
 CREATE USER IF NOT EXISTS 'admin'@'localhost' IDENTIFIED BY '%s';
 GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;
 

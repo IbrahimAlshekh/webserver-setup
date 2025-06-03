@@ -2,6 +2,7 @@ package nginx
 
 import (
 	"os"
+	"strings"
 
 	"laravel-setup/pkg/config"
 	"laravel-setup/pkg/templates"
@@ -27,9 +28,24 @@ func Install(config *config.Config) error {
 
 	// Add rate-limiting zones to nginx.conf for security
 	// This helps prevent brute force and DoS attacks
-	err = utils.RunCommand("sudo", "sed", "-i", `/http {/a\\n    # Rate limiting zones\n    limit_req_zone $binary_remote_addr zone=login:10m rate=10r/m;\n    limit_req_zone $binary_remote_addr zone=api:10m rate=100r/m;`, "/etc/nginx/nginx.conf")
-	if err != nil {
+
+	// Check if rate-limiting zones already exist to prevent duplication
+	_, err = utils.RunCommandWithOutput("sudo", "grep", "limit_req_zone.*zone=login", "/etc/nginx/nginx.conf")
+	if err != nil && !strings.Contains(err.Error(), "exit status 1") {
+		// Real error, not just "not found"
 		return err
+	}
+
+	// Only add rate-limiting zones if they don't already exist
+	if err != nil {
+		// Rate-limiting zones don't exist, add them
+		err = utils.RunCommand("sudo", "sed", "-i", `/http {/a\\n    # Rate limiting zones\n    limit_req_zone $binary_remote_addr zone=login:10m rate=10r/m;\n    limit_req_zone $binary_remote_addr zone=api:10m rate=100r/m;`, "/etc/nginx/nginx.conf")
+		if err != nil {
+			return err
+		}
+		utils.PrintStatus("Added rate limiting zones to nginx.conf")
+	} else {
+		utils.PrintStatus("Rate limiting zones already exist in nginx.conf")
 	}
 
 	// Create the site configuration using the template
@@ -67,7 +83,7 @@ func Install(config *config.Config) error {
 	}
 
 	utils.PrintStatus("Nginx configuration is valid")
-	
+
 	// Restart Nginx to apply changes
 	err = utils.RunCommand("sudo", "systemctl", "restart", "nginx")
 	if err != nil {
