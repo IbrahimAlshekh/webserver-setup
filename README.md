@@ -34,6 +34,26 @@ A Go tool to automate the setup of a production-ready Laravel server on Ubuntu.
    make build
    ```
 
+   Or build specifically for Linux:
+   ```
+   make build-linux
+   ```
+
+   Or build specifically for x64 architecture (macOS Intel):
+   ```
+   make build-x64
+   ```
+
+   Or build specifically for ARM64 architecture (Apple Silicon):
+   ```
+   make build-arm64
+   ```
+
+   Or build specifically for x86 architecture (32-bit):
+   ```
+   make build-x86
+   ```
+
 3. (Optional) Install the binary to /usr/local/bin:
    ```
    make install
