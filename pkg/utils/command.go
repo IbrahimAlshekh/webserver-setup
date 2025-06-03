@@ -69,3 +69,53 @@ func CheckSudoPrivileges() bool {
 	}
 	return true
 }
+
+// RunInteractiveCommand executes a shell command that requires user interaction
+// Connects stdin, stdout, and stderr to allow for interactive input/output
+func RunInteractiveCommand(command string, args ...string) error {
+	cmd := exec.Command(command, args...)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+// RunCommandWithFileInput executes a shell command with the contents of a file as input
+// Useful for commands that would normally use shell redirection (e.g., mysql < file.sql)
+func RunCommandWithFileInput(inputFile string, command string, args ...string) error {
+	// Read the input file
+	input, err := os.ReadFile(inputFile)
+	if err != nil {
+		return err
+	}
+
+	// Create the command
+	cmd := exec.Command(command, args...)
+
+	// Create a pipe to the command's stdin
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		return err
+	}
+
+	// Set up stdout and stderr
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	// Start the command
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+
+	// Write the file contents to the command's stdin
+	_, err = stdin.Write(input)
+	if err != nil {
+		return err
+	}
+
+	// Close stdin to signal EOF
+	stdin.Close()
+
+	// Wait for the command to complete
+	return cmd.Wait()
+}
