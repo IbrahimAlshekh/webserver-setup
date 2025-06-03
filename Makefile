@@ -40,6 +40,11 @@ run: build
 	@echo "Running laravel-setup..."
 	@./laravel-setup
 
+
+upload: build-linux
+	@echo "Uploading to server"
+	@scp ./laravel-setup-linux skillshare:~/
+
 # Help message
 help:
 	@echo "Laravel Setup - A tool to set up Laravel production servers"
