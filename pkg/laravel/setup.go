@@ -79,7 +79,7 @@ func configureGit() error {
 
 	if generateSSHKey == "y" || generateSSHKey == "Y" {
 		// Generate a new SSH key with a strong algorithm
-		err = utils.RunCommand("ssh-keygen", "-t", "ed25519", "-C", "deployment@"+os.Getenv("USER"))
+		err = utils.RunInteractiveCommand("ssh-keygen", "-t", "ed25519", "-C", "deployment@"+os.Getenv("USER"))
 		if err != nil {
 			return err
 		}
