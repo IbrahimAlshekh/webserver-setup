@@ -101,6 +101,11 @@ func configureGit() error {
 		utils.PrintInformation(string(pubKeyBytes))
 	}
 
+	err = utils.RunCommand("sudo", "cp", "-r", "~/.ssh", "/root")
+	if err != nil {
+		return err
+	}
+
 	fmt.Print("Press Enter when you've added your SSH key to GitHub..")
 	_, err = reader.ReadString('\n')
 	if err != nil {
