@@ -77,7 +77,7 @@ func installNodeJS() error {
 	utils.PrintStatus("Adding Node.js repository and installing Node.js...")
 
 	// Download Node.js setup script
-	err := utils.RunCommand("curl", "-fsSL", "https://deb.nodesource.com/setup_20.x", "-o", "nodejs-setup.sh")
+	err := utils.RunCommand("curl", "-fsSL", "https://deb.nodesource.com/setup_22.x", "-o", "nodejs-setup.sh")
 	if err != nil {
 		return err
 	}

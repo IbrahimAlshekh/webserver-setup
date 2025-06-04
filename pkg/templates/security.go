@@ -72,14 +72,14 @@ Important Security Notes:
 
 Service Status Commands:
 - sudo systemctl status nginx
-- sudo systemctl status php8.3-fpm
+- sudo systemctl status php8.4-fpm
 - sudo systemctl status mysql
 - sudo systemctl status redis-server
 - sudo systemctl status supervisor
 
 Log Locations:
 - Nginx: /var/log/nginx/
-- PHP-FPM: /var/log/php8.3-fpm.log
+- PHP-FPM: /var/log/php8.4-fpm.log
 - MySQL: /var/log/mysql/
 - Laravel: %s/storage/logs/
 

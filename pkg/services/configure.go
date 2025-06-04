@@ -21,7 +21,7 @@ func Configure(config *config.Config) error {
 	}
 
 	// Enable and start PHP-FPM
-	if err := enableService("php8.3-fpm"); err != nil {
+	if err := enableService("php8.4-fp"); err != nil {
 		return err
 	}
 
@@ -60,7 +60,7 @@ func Configure(config *config.Config) error {
 // enableService enables and starts a service
 func enableService(service string) error {
 	utils.PrintStatus("Enabling and starting " + service + "...")
-	
+
 	// Enable service to start on boot
 	err := utils.RunCommand("sudo", "systemctl", "enable", service)
 	if err != nil {
@@ -80,7 +80,7 @@ func enableService(service string) error {
 func setupSSL(config *config.Config) error {
 	utils.PrintHeader("Setting up SSL Certificate")
 	utils.PrintWarning("Make sure your domain DNS is pointing to this server before running SSL setup")
-	
+
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("Do you want to setup SSL certificate now? (y/n): ")
 	setupSSL, _ := reader.ReadString('\n')

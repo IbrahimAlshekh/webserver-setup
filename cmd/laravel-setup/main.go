@@ -37,10 +37,6 @@ func getSkipStatus(skip bool) string {
 }
 
 func main() {
-	// Define command-line flags
-	cleanupFlag := flag.Bool("cleanup", false, "Clean up temporary files created during the setup process")
-	configPathFlag := flag.String("config-path", "", "Path to the configuration file (default: ~/config.toml)")
-
 	// Module selection flags
 	skipSystemUpdateFlag := flag.Bool("skip-system-update", false, "Skip system update step")
 	skipEssentialsFlag := flag.Bool("skip-essentials", false, "Skip installing essential packages")
@@ -50,18 +46,9 @@ func main() {
 	skipSecurityFlag := flag.Bool("skip-security", false, "Skip security configuration")
 	skipLaravelFlag := flag.Bool("skip-laravel", false, "Skip Laravel setup")
 	skipServicesFlag := flag.Bool("skip-services", false, "Skip services configuration")
+	configPathFlag := flag.String("config-path", "", "Path to the configuration file (default: ~/config.toml)")
 
 	flag.Parse()
-
-	// Check if a cleanup flag is set
-	if *cleanupFlag {
-		err := utils.CleanupTempFiles()
-		if err != nil {
-			utils.PrintError("Failed to clean up temporary files: " + err.Error())
-			os.Exit(1)
-		}
-		os.Exit(0)
-	}
 
 	// Print a welcome message
 	utils.PrintHeader("Laravel Production Server Setup")
@@ -69,10 +56,13 @@ func main() {
 	// Check if running as root and if the user has sudo privileges
 	// These are security checks to ensure the script is run correctly
 	if !utils.CheckNotRoot() {
+		utils.PrintError("This script should not be run as root for security reasons")
 		os.Exit(1)
 	}
 
 	if !utils.CheckSudoPrivileges() {
+		utils.PrintError("This user doesn't have sudo privileges")
+		utils.PrintWarning("Please add this user to the sudo group: sudo usermod -aG sudo " + os.Getenv("USER"))
 		os.Exit(1)
 	}
 
@@ -92,19 +82,12 @@ func main() {
 	utils.PrintStatus("The setup process is divided into several steps:")
 	utils.PrintStatus("1. System update" + getSkipStatus(*skipSystemUpdateFlag))
 	utils.PrintStatus("2. Installing essential packages" + getSkipStatus(*skipEssentialsFlag))
-	utils.PrintStatus("3. Installing PHP 8.3 and extensions" + getSkipStatus(*skipPHPFlag))
+	utils.PrintStatus("3. Installing PHP 8.4 and extensions" + getSkipStatus(*skipPHPFlag))
 	utils.PrintStatus("4. Installing and configuring MySQL" + getSkipStatus(*skipMySQLFlag))
 	utils.PrintStatus("5. Installing and configuring Nginx" + getSkipStatus(*skipNginxFlag))
 	utils.PrintStatus("6. Configuring security (firewall, fail2ban, SSH)" + getSkipStatus(*skipSecurityFlag))
 	utils.PrintStatus("7. Setting up Laravel application" + getSkipStatus(*skipLaravelFlag))
 	utils.PrintStatus("8. Configuring and starting services" + getSkipStatus(*skipServicesFlag))
-	utils.PrintStatus("")
-	utils.PrintWarning("This process may take some time. Please be patient.")
-	utils.PrintWarning("You will be prompted for input at certain stages.")
-	utils.PrintStatus("")
-	utils.PrintStatus("Note: You can skip any step by using the corresponding command-line flag:")
-	utils.PrintStatus("  --skip-system-update, --skip-essentials, --skip-php, --skip-mysql,")
-	utils.PrintStatus("  --skip-nginx, --skip-security, --skip-laravel, --skip-services")
 	utils.PrintStatus("")
 
 	fmt.Print("Press Enter to begin the setup process...")

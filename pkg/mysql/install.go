@@ -23,7 +23,6 @@ func Install(config *config.Config) error {
 
 	// Secure MySQL installation
 	utils.PrintHeader("Securing MySQL Installation")
-	utils.PrintWarning("Please set a strong root password when prompted")
 	err = utils.RunInteractiveCommand("sudo", "mysql_secure_installation")
 	if err != nil {
 		return err

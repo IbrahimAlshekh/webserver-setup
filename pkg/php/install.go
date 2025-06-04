@@ -8,10 +8,10 @@ import (
 	"laravel-setup/pkg/utils"
 )
 
-// Install installs PHP 8.3 and required extensions for Laravel
+// Install installs PHP 8.4 and required extensions for Laravel
 func Install(_ *config.Config) error {
-	utils.PrintHeader("Installing PHP 8.3 and Extensions")
-	utils.PrintStatus("Adding PHP repository and installing PHP 8.3 with extensions...")
+	utils.PrintHeader("Installing PHP 8.4 and Extensions")
+	utils.PrintStatus("Adding PHP repository and installing PHP 8.4 with extensions...")
 
 	// Add a PHP repository from Ondrej (maintained PPA for latest PHP versions)
 	err := utils.RunCommand("sudo", "add-apt-repository", "ppa:ondrej/php", "-y")
@@ -27,15 +27,15 @@ func Install(_ *config.Config) error {
 
 	// Install PHP and extensions required for Laravel
 	err = utils.RunCommand("sudo", "apt", "install", "-y",
-		"php8.3", "php8.3-fpm", "php8.3-mysql", "php8.3-mbstring",
-		"php8.3-xml", "php8.3-bcmath", "php8.3-curl", "php8.3-gd",
-		"php8.3-zip", "php8.3-intl", "php8.3-soap", "php8.3-redis",
-		"php8.3-imagick", "php8.3-cli", "php8.3-common", "php8.3-opcache")
+		"php8.4", "php8.4-fpm", "php8.4-mysql", "php8.4-mbstring",
+		"php8.4-xml", "php8.4-bcmath", "php8.4-curl", "php8.4-gd",
+		"php8.4-zip", "php8.4-intl", "php8.4-soap", "php8.4-redis",
+		"php8.4-imagick", "php8.4-cli", "php8.4-common", "php8.4-opcache")
 	if err != nil {
 		return err
 	}
 
-	utils.PrintStatus("PHP 8.3 and extensions installed successfully")
+	utils.PrintStatus("PHP 8.4 and extensions installed successfully")
 
 	// Configure PHP-FPM for optimal Laravel performance
 	if err := configurePHPFPM(); err != nil {
@@ -58,31 +58,31 @@ func configurePHPFPM() error {
 
 	// Adjust PHP settings for Laravel
 	// Disable path info fixing for security
-	err := utils.RunCommand("sudo", "sed", "-i", "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/", "/etc/php/8.3/fpm/php.ini")
+	err := utils.RunCommand("sudo", "sed", "-i", "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/", "/etc/php/8.4/fpm/php.ini")
 	if err != nil {
 		return err
 	}
 
 	// Increase upload size limit for larger file uploads
-	err = utils.RunCommand("sudo", "sed", "-i", "s/upload_max_filesize = 2M/upload_max_filesize = 64M/", "/etc/php/8.3/fpm/php.ini")
+	err = utils.RunCommand("sudo", "sed", "-i", "s/upload_max_filesize = 2M/upload_max_filesize = 64M/", "/etc/php/8.4/fpm/php.ini")
 	if err != nil {
 		return err
 	}
 
 	// Increase post-size limit to match upload size
-	err = utils.RunCommand("sudo", "sed", "-i", "s/post_max_size = 8M/post_max_size = 64M/", "/etc/php/8.3/fpm/php.ini")
+	err = utils.RunCommand("sudo", "sed", "-i", "s/post_max_size = 8M/post_max_size = 64M/", "/etc/php/8.4/fpm/php.ini")
 	if err != nil {
 		return err
 	}
 
 	// Increase execution time for longer-running scripts
-	err = utils.RunCommand("sudo", "sed", "-i", "s/max_execution_time = 30/max_execution_time = 300/", "/etc/php/8.3/fpm/php.ini")
+	err = utils.RunCommand("sudo", "sed", "-i", "s/max_execution_time = 30/max_execution_time = 300/", "/etc/php/8.4/fpm/php.ini")
 	if err != nil {
 		return err
 	}
 
 	// Increase the memory limit for more complex applications
-	err = utils.RunCommand("sudo", "sed", "-i", "s/memory_limit = 128M/memory_limit = 512M/", "/etc/php/8.3/fpm/php.ini")
+	err = utils.RunCommand("sudo", "sed", "-i", "s/memory_limit = 128M/memory_limit = 512M/", "/etc/php/8.4/fpm/php.ini")
 	if err != nil {
 		return err
 	}
@@ -97,13 +97,13 @@ func configurePHPFPM() error {
 	}
 
 	// Move OPcache configuration to PHP configuration directory
-	err = utils.RunCommand("sudo", "mv", "opcache.ini", "/etc/php/8.3/fpm/conf.d/10-opcache.ini")
+	err = utils.RunCommand("sudo", "mv", "opcache.ini", "/etc/php/8.4/fpm/conf.d/10-opcache.ini")
 	if err != nil {
 		return err
 	}
 
 	// Restart PHP-FPM to apply changes
-	err = utils.RunCommand("sudo", "systemctl", "restart", "php8.3-fpm")
+	err = utils.RunCommand("sudo", "systemctl", "restart", "php8.4-fpm")
 	if err != nil {
 		return err
 	}

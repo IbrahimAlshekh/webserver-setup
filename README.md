@@ -5,7 +5,7 @@ A Go tool to automate the setup of a production-ready Laravel server on Ubuntu.
 ## Features
 
 - System update and essential packages installation
-- PHP 8.3 installation with optimized configuration
+- PHP 8.4 installation with optimized configuration
 - MySQL installation and secure configuration
 - Nginx installation with optimized configuration for Laravel
 - Security hardening (firewall, fail2ban, SSH)

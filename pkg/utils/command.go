@@ -61,13 +61,7 @@ func CheckNotRoot() bool {
 func CheckSudoPrivileges() bool {
 	cmd := exec.Command("sudo", "-n", "true")
 	err := cmd.Run()
-	if err != nil {
-		PrintError("This user doesn't have sudo privileges")
-		PrintWarning("Please add this user to the sudo group:")
-		PrintWarning("  sudo usermod -aG sudo $USER")
-		return false
-	}
-	return true
+	return err == nil
 }
 
 // RunInteractiveCommand executes a shell command that requires user interaction
